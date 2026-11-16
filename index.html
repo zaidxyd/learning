@@ -5,6 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>تسجيل الدخول</title>
   <style>
+    :root {
+      --bg1: #4f46e5;
+      --bg2: #7c3aed;
+      --card: rgba(255, 255, 255, 0.78);
+      --card-border: rgba(255, 255, 255, 0.55);
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --input: #ffffff;
+      --accent: #4f46e5;
+      --btn: #4f46e5;
+      --btn-hover: #4338ca;
+      --danger: #dc2626;
+      --ok: #16a34a;
+      --warn: #d97706;
+    }
+    [data-theme="dark"] {
+      --bg1: #0f172a;
+      --bg2: #1e1b4b;
+      --card: rgba(30, 41, 59, 0.72);
+      --card-border: rgba(148, 163, 184, 0.2);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --border: #334155;
+      --input: #0f172a;
+      --accent: #a5b4fc;
+      --danger: #f87171;
+      --ok: #4ade80;
+      --warn: #fbbf24;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -13,165 +44,438 @@
       align-items: center;
       justify-content: center;
       font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      color: var(--text);
       padding: 16px;
+      overflow: hidden;
+      transition: background 0.4s;
+    }
+
+    /* Animated background blobs */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.5;
+      pointer-events: none;
+      animation: float 14s ease-in-out infinite alternate;
+    }
+    .blob.b1 { width: 340px; height: 340px; background: #ec4899; top: -80px; inset-inline-start: -80px; }
+    .blob.b2 { width: 300px; height: 300px; background: #22d3ee; bottom: -90px; inset-inline-end: -60px; animation-delay: -5s; }
+    .blob.b3 { width: 220px; height: 220px; background: #f59e0b; top: 45%; inset-inline-start: 55%; animation-delay: -9s; opacity: 0.3; }
+    @keyframes float {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(40px, -50px) scale(1.18); }
     }
 
     .card {
-      background: #fff;
+      position: relative;
       width: 100%;
-      max-width: 380px;
-      padding: 32px 28px;
+      max-width: 400px;
+      padding: 30px 28px 28px;
+      border-radius: 20px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+      animation: enter 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+    @keyframes enter {
+      from { opacity: 0; transform: translateY(28px) scale(0.96); }
+      to   { opacity: 1; transform: none; }
+    }
+    .card.shake { animation: shake 0.45s; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-9px); }
+      40% { transform: translateX(9px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .chip {
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.2s;
+    }
+    .chip:hover { transform: translateY(-1px); background: rgba(127, 127, 127, 0.15); }
+
+    .logo {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 14px;
       border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #4f46e5, #ec4899);
+      box-shadow: 0 8px 20px rgba(79, 70, 229, 0.45);
     }
+    .logo svg { width: 28px; height: 28px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-    h1 {
-      text-align: center;
-      font-size: 1.6rem;
-      color: #1f2937;
-      margin-bottom: 6px;
+    h1 { text-align: center; font-size: 1.55rem; margin-bottom: 6px; }
+    .subtitle { text-align: center; color: var(--muted); font-size: 0.95rem; margin-bottom: 22px; }
+
+    label { display: block; font-size: 0.88rem; margin-bottom: 6px; }
+
+    .field { position: relative; margin-bottom: 16px; }
+    .field .icon {
+      position: absolute;
+      inset-inline-start: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      stroke: var(--muted);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: none;
+      transition: stroke 0.2s;
     }
+    .field:focus-within .icon { stroke: var(--accent); }
 
-    .subtitle {
-      text-align: center;
-      color: #6b7280;
-      font-size: 0.95rem;
-      margin-bottom: 24px;
-    }
-
-    label {
-      display: block;
-      font-size: 0.9rem;
-      color: #374151;
-      margin-bottom: 6px;
-    }
-
-    input[type="email"],
-    input[type="password"],
-    input[type="text"] {
+    .field input {
       width: 100%;
-      padding: 11px 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
+      padding: 12px 14px;
+      padding-inline-start: 40px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--input);
+      color: var(--text);
       font-size: 1rem;
-      margin-bottom: 16px;
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-
-    input:focus {
-      border-color: #4f46e5;
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
     }
-
-    .password-wrap { position: relative; }
+    .field input.invalid { border-color: var(--danger); }
+    .field.has-toggle input { padding-inline-end: 64px; }
 
     .toggle {
       position: absolute;
-      left: 10px;
-      top: 9px;
+      inset-inline-end: 8px;
+      top: 50%;
+      transform: translateY(-50%);
       background: none;
       border: none;
-      color: #4f46e5;
-      font-size: 0.85rem;
+      color: var(--accent);
+      font-size: 0.82rem;
       cursor: pointer;
+      padding: 4px 6px;
     }
+
+    /* Password strength meter */
+    .strength { margin: -6px 0 14px; display: none; }
+    .strength.show { display: block; }
+    .bars { display: flex; gap: 5px; }
+    .bars span { flex: 1; height: 5px; border-radius: 4px; background: var(--border); transition: background 0.3s; }
+    .bars[data-score="1"] span:nth-child(-n+1) { background: var(--danger); }
+    .bars[data-score="2"] span:nth-child(-n+2) { background: var(--warn); }
+    .bars[data-score="3"] span:nth-child(-n+3) { background: #84cc16; }
+    .bars[data-score="4"] span:nth-child(-n+4) { background: var(--ok); }
+    .strength-label { font-size: 0.78rem; color: var(--muted); margin-top: 5px; }
+
+    .caps { display: none; font-size: 0.8rem; color: var(--warn); margin: -8px 0 12px; }
+    .caps.show { display: block; }
 
     .row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.88rem;
-      margin-bottom: 20px;
+      font-size: 0.86rem;
+      margin-bottom: 18px;
+      gap: 10px;
     }
-
-    .row label { margin: 0; display: flex; align-items: center; gap: 6px; }
-    .row a { color: #4f46e5; text-decoration: none; }
+    .row label { margin: 0; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    .row input[type="checkbox"] { accent-color: var(--btn); width: 16px; height: 16px; }
+    .row a { color: var(--accent); text-decoration: none; }
     .row a:hover { text-decoration: underline; }
 
-    button.submit {
+    .submit {
       width: 100%;
-      padding: 12px;
-      background: #4f46e5;
-      color: #fff;
+      padding: 13px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--btn), #7c3aed);
+      color: #fff;
       font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
     }
+    .submit:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(79, 70, 229, 0.5); }
+    .submit:active { transform: translateY(0); }
+    .submit:disabled { opacity: 0.75; cursor: wait; transform: none; }
 
-    button.submit:hover { background: #4338ca; }
-
-    .message {
-      margin-top: 16px;
-      text-align: center;
-      font-size: 0.9rem;
-      min-height: 1.2em;
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255, 255, 255, 0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
     }
-    .message.error { color: #dc2626; }
-    .message.success { color: #16a34a; }
+    .submit.loading .spinner { display: block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .message { margin-top: 14px; text-align: center; font-size: 0.9rem; min-height: 1.3em; }
+    .message.error { color: var(--danger); }
+
+    /* Success view */
+    .success { display: none; text-align: center; padding: 14px 0 6px; }
+    .success.show { display: block; animation: enter 0.6s both; }
+    .check { width: 84px; height: 84px; margin: 0 auto 16px; }
+    .check circle { stroke: var(--ok); stroke-width: 3; fill: none; stroke-dasharray: 190; stroke-dashoffset: 190; animation: draw 0.7s 0.1s forwards; }
+    .check path { stroke: var(--ok); stroke-width: 4; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 50; stroke-dashoffset: 50; animation: draw 0.5s 0.7s forwards; }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+    .success h2 { font-size: 1.35rem; margin-bottom: 6px; }
+    .success p { color: var(--muted); font-size: 0.92rem; margin-bottom: 18px; }
+
+    .hidden { display: none !important; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    }
   </style>
 </head>
 <body>
-  <main class="card">
-    <h1>مرحباً بعودتك</h1>
-    <p class="subtitle">سجّل الدخول للمتابعة</p>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
 
-    <form id="loginForm" novalidate>
-      <label for="email">البريد الإلكتروني</label>
-      <input type="email" id="email" placeholder="example@mail.com" autocomplete="email" required>
+  <main class="card" id="card">
+    <div class="topbar">
+      <button type="button" class="chip" id="themeBtn"></button>
+      <button type="button" class="chip" id="langBtn"></button>
+    </div>
 
-      <label for="password">كلمة المرور</label>
-      <div class="password-wrap">
-        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
-        <button type="button" class="toggle" id="toggle">إظهار</button>
+    <div id="formView">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
       </div>
+      <h1 data-i18n="title"></h1>
+      <p class="subtitle" data-i18n="subtitle"></p>
 
-      <div class="row">
-        <label><input type="checkbox" id="remember"> تذكرني</label>
-        <a href="#">نسيت كلمة المرور؟</a>
-      </div>
+      <form id="loginForm" novalidate>
+        <label for="email" data-i18n="email"></label>
+        <div class="field">
+          <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>
+          <input type="email" id="email" data-i18n-ph="emailPh" autocomplete="email" required>
+        </div>
 
-      <button type="submit" class="submit">تسجيل الدخول</button>
-      <p class="message" id="message" role="alert"></p>
-    </form>
+        <label for="password" data-i18n="password"></label>
+        <div class="field has-toggle">
+          <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
+          <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
+          <button type="button" class="toggle" id="toggle"></button>
+        </div>
+
+        <p class="caps" id="caps" data-i18n="caps"></p>
+
+        <div class="strength" id="strength">
+          <div class="bars" id="bars" data-score="0"><span></span><span></span><span></span><span></span></div>
+          <p class="strength-label" id="strengthLabel"></p>
+        </div>
+
+        <div class="row">
+          <label><input type="checkbox" id="remember"> <span data-i18n="remember"></span></label>
+          <a href="#" data-i18n="forgot"></a>
+        </div>
+
+        <button type="submit" class="submit" id="submitBtn">
+          <span class="spinner"></span>
+          <span id="submitText" data-i18n="submit"></span>
+        </button>
+        <p class="message" id="message" role="alert"></p>
+      </form>
+    </div>
+
+    <div class="success" id="successView">
+      <svg class="check" viewBox="0 0 84 84" aria-hidden="true">
+        <circle cx="42" cy="42" r="30"></circle>
+        <path d="M29 43l9 9 18-20"></path>
+      </svg>
+      <h2 id="welcome"></h2>
+      <p data-i18n="demoNote"></p>
+      <button type="button" class="chip" id="backBtn" data-i18n="back"></button>
+    </div>
   </main>
 
   <script>
-    const form = document.getElementById("loginForm");
-    const email = document.getElementById("email");
-    const password = document.getElementById("password");
-    const toggle = document.getElementById("toggle");
-    const message = document.getElementById("message");
+    const T = {
+      ar: {
+        title: "مرحباً بعودتك", subtitle: "سجّل الدخول للمتابعة",
+        email: "البريد الإلكتروني", emailPh: "example@mail.com",
+        password: "كلمة المرور", show: "إظهار", hide: "إخفاء",
+        remember: "تذكرني", forgot: "نسيت كلمة المرور؟", submit: "تسجيل الدخول",
+        caps: "⚠ زر Caps Lock مفعّل",
+        errEmail: "يرجى إدخال بريد إلكتروني صحيح.",
+        errPass: "كلمة المرور يجب ألا تقل عن 6 أحرف.",
+        s1: "ضعيفة", s2: "متوسطة", s3: "جيدة", s4: "قوية",
+        welcome: "أهلاً بك، ", demoNote: "هذه واجهة تجريبية، لم يتم الاتصال بأي خادم.", back: "رجوع",
+        themeDark: "🌙 داكن", themeLight: "☀️ فاتح", langBtn: "English", pageTitle: "تسجيل الدخول"
+      },
+      en: {
+        title: "Welcome back", subtitle: "Sign in to continue",
+        email: "Email", emailPh: "example@mail.com",
+        password: "Password", show: "Show", hide: "Hide",
+        remember: "Remember me", forgot: "Forgot password?", submit: "Sign in",
+        caps: "⚠ Caps Lock is on",
+        errEmail: "Please enter a valid email address.",
+        errPass: "Password must be at least 6 characters.",
+        s1: "Weak", s2: "Fair", s3: "Good", s4: "Strong",
+        welcome: "Welcome, ", demoNote: "This is a demo UI. No server was contacted.", back: "Back",
+        themeDark: "🌙 Dark", themeLight: "☀️ Light", langBtn: "عربي", pageTitle: "Sign in"
+      }
+    };
 
-    toggle.addEventListener("click", () => {
-      const hidden = password.type === "password";
-      password.type = hidden ? "text" : "password";
-      toggle.textContent = hidden ? "إخفاء" : "إظهار";
+    const $ = (id) => document.getElementById(id);
+    const card = $("card"), form = $("loginForm");
+    const email = $("email"), password = $("password");
+    const message = $("message"), submitBtn = $("submitBtn");
+
+    let lang = "ar";
+    let theme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    let msgKey = null;
+    let pwVisible = false;
+    let welcomeName = "";
+
+    // Light per-viewer preferences (safe if storage is blocked)
+    const store = {
+      get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+      set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+      del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+    };
+
+    function t(key) { return T[lang][key]; }
+
+    function render() {
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+      document.documentElement.setAttribute("data-theme", theme);
+      document.title = t("pageTitle");
+
+      document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
+      document.querySelectorAll("[data-i18n-ph]").forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
+
+      $("toggle").textContent = pwVisible ? t("hide") : t("show");
+      $("themeBtn").textContent = theme === "dark" ? t("themeLight") : t("themeDark");
+      $("langBtn").textContent = t("langBtn");
+      message.textContent = msgKey ? t(msgKey) : "";
+      if (welcomeName) $("welcome").textContent = t("welcome") + welcomeName;
+      updateStrength();
+    }
+
+    function scorePassword(pw) {
+      if (!pw) return 0;
+      let s = 0;
+      if (pw.length >= 6) s++;
+      if (pw.length >= 10) s++;
+      if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) s++;
+      if (/\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) s++;
+      return Math.max(1, Math.min(4, s));
+    }
+
+    function updateStrength() {
+      const score = scorePassword(password.value);
+      $("strength").classList.toggle("show", score > 0);
+      $("bars").dataset.score = score;
+      $("strengthLabel").textContent = score ? t("s" + score) : "";
+    }
+
+    function showError(key, input) {
+      msgKey = key;
+      message.className = "message error";
+      message.textContent = t(key);
+      input.classList.add("invalid");
+      input.focus();
+      card.classList.remove("shake");
+      void card.offsetWidth; // restart animation
+      card.classList.add("shake");
+    }
+
+    // Events
+    $("themeBtn").addEventListener("click", () => { theme = theme === "dark" ? "light" : "dark"; store.set("theme", theme); render(); });
+    $("langBtn").addEventListener("click", () => { lang = lang === "ar" ? "en" : "ar"; store.set("lang", lang); render(); });
+
+    $("toggle").addEventListener("click", () => {
+      pwVisible = !pwVisible;
+      password.type = pwVisible ? "text" : "password";
+      render();
     });
+
+    password.addEventListener("input", () => { password.classList.remove("invalid"); updateStrength(); });
+    email.addEventListener("input", () => email.classList.remove("invalid"));
+
+    ["keydown", "keyup"].forEach((ev) =>
+      password.addEventListener(ev, (e) => {
+        if (e.getModifierState) $("caps").classList.toggle("show", e.getModifierState("CapsLock"));
+      })
+    );
+    password.addEventListener("blur", () => $("caps").classList.remove("show"));
 
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      message.className = "message";
+      msgKey = null;
+      message.textContent = "";
 
-      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
-      if (!emailOk) {
-        message.textContent = "يرجى إدخال بريد إلكتروني صحيح.";
-        message.classList.add("error");
-        return;
-      }
-      if (password.value.length < 6) {
-        message.textContent = "كلمة المرور يجب ألا تقل عن 6 أحرف.";
-        message.classList.add("error");
-        return;
-      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) return showError("errEmail", email);
+      if (password.value.length < 6) return showError("errPass", password);
 
-      // هذه واجهة فقط: اربطها بالخادم (API) هنا لتنفيذ تسجيل الدخول فعلياً
-      message.textContent = "تم التحقق من البيانات بنجاح ✔";
-      message.classList.add("success");
+      if ($("remember").checked) store.set("rememberedEmail", email.value.trim());
+      else store.del("rememberedEmail");
+
+      // Simulated request: replace this with a real API call to your server
+      submitBtn.disabled = true;
+      submitBtn.classList.add("loading");
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("loading");
+        welcomeName = email.value.trim().split("@")[0];
+        $("formView").classList.add("hidden");
+        $("successView").classList.add("show");
+        render();
+      }, 1200);
     });
+
+    $("backBtn").addEventListener("click", () => {
+      $("successView").classList.remove("show");
+      $("formView").classList.remove("hidden");
+      password.value = "";
+      welcomeName = "";
+      render();
+    });
+
+    // Restore preferences
+    const savedTheme = store.get("theme");
+    const savedLang = store.get("lang");
+    if (savedTheme === "dark" || savedTheme === "light") theme = savedTheme;
+    if (savedLang === "ar" || savedLang === "en") lang = savedLang;
+    const savedEmail = store.get("rememberedEmail");
+    if (savedEmail) { email.value = savedEmail; $("remember").checked = true; }
+
+    render();
   </script>
 </body>
 </html>
